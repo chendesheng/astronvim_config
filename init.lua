@@ -53,6 +53,7 @@ local config = {
       { "https://tpope.io/vim/surround.git" },
       { "https://tpope.io/vim/unimpaired.git" },
       { "https://tpope.io/vim/repeat.git" },
+      { "nathom/filetype.nvim" },
       -- { "OmniSharp/omnisharp-vim" },
       -- { "hrsh7th/cmp-omni" },
       -- {
@@ -111,7 +112,7 @@ local config = {
         ["<leader>"] = {
           -- which-key registration table for normal mode, leader prefix
           -- ["N"] = { "<cmd>tabnew<cr>", "New Buffer" },
-          [','] = { "<cmd>e ~/.config/nvim/lua/user/init.lua<cr>", "Edit init file" }
+          [','] = { function() require'telescope.builtin'.find_files({cwd='~/.config/nvim/lua/user/'}) end, "Find config file" }
         },
         g = {
           h = { vim.lsp.buf.hover, "Hover symbol details" },
@@ -231,6 +232,18 @@ local config = {
       pattern = "plugins.lua",
       command = "source <afile> | PackerSync",
     })
+
+    require'filetype'.setup {
+      overrides = {
+        extensions = {
+            -- Set the filetype of *.pn files to potion
+            fsproj = "xml",
+            fs = "fsharp",
+            fsx = "fsharp",
+            fsi = "fsharp",
+        },
+      }
+    }
 
     -- require'cmp'.setup {
     --   sources = {
