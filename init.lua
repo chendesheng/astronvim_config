@@ -45,6 +45,7 @@ local config = {
     init = {
       -- You can disable default plugins as follows:
       ["karb94/neoscroll.nvim"] = { disable = true },
+      ["declancm/cinnamon.nvim"] = { disable = true },
       ["max397574/better-escape.nvim"] = { disable = true },
       ["feline-nvim/feline.nvim"] = { disable = true },
 
