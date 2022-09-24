@@ -1,4 +1,3 @@
-
 local config = {
 
   -- Set colorscheme
@@ -12,8 +11,8 @@ local config = {
     },
     g = {
       mapleader = " ", -- sets vim.g.mapleader
-      ['fsharp#lsp_codelens'] = 0,
-      ['fsharp#show_signature_on_cursor_move'] = 0,
+      -- ['fsharp#lsp_codelens'] = 0,
+      -- ['fsharp#show_signature_on_cursor_move'] = 0,
       -- ['OmniSharp_server_use_net6'] = 1,
     },
   },
@@ -22,9 +21,9 @@ local config = {
   default_theme = {
     diagnostics_style = { italic = true },
     -- Modify the color table
-    colors = {
-      fg = "#abb2bf",
-    },
+    -- colors = {
+    --   fg = "#abb2bf",
+    -- },
     -- Modify the highlight groups
     highlights = function(highlights)
       local C = require "default_theme.colors"
@@ -47,9 +46,10 @@ local config = {
       -- You can disable default plugins as follows:
       ["karb94/neoscroll.nvim"] = { disable = true },
       ["max397574/better-escape.nvim"] = { disable = true },
+      ["feline-nvim/feline.nvim"] = { disable = true },
 
       -- You can also add new plugins here as well:
-      { "ionide/Ionide-vim" },
+      -- { "ionide/Ionide-vim" },
       { "https://tpope.io/vim/surround.git" },
       { "https://tpope.io/vim/unimpaired.git" },
       { "https://tpope.io/vim/repeat.git" },
@@ -77,11 +77,11 @@ local config = {
     telescope = {
       defaults = {
         mappings = {
-            i = {
-                ["<esc>"] = require("telescope.actions").close,
-                ["<C-n>"] = require("telescope.actions").move_selection_next,
-                ["<C-p>"] = require("telescope.actions").move_selection_previous,
-            },
+          i = {
+            ["<esc>"] = require("telescope.actions").close,
+            ["<C-n>"] = require("telescope.actions").move_selection_next,
+            ["<C-p>"] = require("telescope.actions").move_selection_previous,
+          },
         },
       },
     },
@@ -112,7 +112,8 @@ local config = {
         ["<leader>"] = {
           -- which-key registration table for normal mode, leader prefix
           -- ["N"] = { "<cmd>tabnew<cr>", "New Buffer" },
-          [','] = { function() require'telescope.builtin'.find_files({cwd='~/.config/nvim/lua/user/'}) end, "Find config file" }
+          [','] = { function() require 'telescope.builtin'.find_files({ cwd = '~/.config/nvim/lua/user/' }) end,
+            "Find config file" }
         },
         g = {
           h = { vim.lsp.buf.hover, "Hover symbol details" },
@@ -143,8 +144,15 @@ local config = {
       -- "pyright"
     },
     -- add to the server on_attach function
-    -- on_attach = function(client, bufnr)
-    -- end,
+    on_attach = function(client)
+      if client.server_capabilities.documentFormattingProvider then
+        vim.api.nvim_create_autocmd("BufWritePre", {
+          desc = "Auto format before save",
+          pattern = "<buffer>",
+          callback = function() vim.lsp.buf.format() end,
+        })
+      end
+    end,
 
     -- override the lsp installer server-registration function
     -- server_registration = function(server, opts)
@@ -171,58 +179,37 @@ local config = {
   -- Diagnostics configuration (for vim.diagnostics.config({}))
   diagnostics = {
     virtual_text = true,
-    underline = true,
+    underline = false,
   },
-
-  -- null-ls configuration
-  ["null-ls"] = function()
-    -- Formatting and linting
-    -- https://github.com/jose-elias-alvarez/null-ls.nvim
-    local status_ok, null_ls = pcall(require, "null-ls")
-    if not status_ok then
-      return
-    end
-
-    -- Check supported formatters
-    -- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins/formatting
-    local formatting = null_ls.builtins.formatting
-
-    -- Check supported linters
-    -- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins/diagnostics
-    local diagnostics = null_ls.builtins.diagnostics
-
-    null_ls.setup {
-      debug = false,
-      sources = {
-        -- Set a formatter
-        formatting.rufo,
-        -- Set a linter
-        diagnostics.rubocop,
-      },
-      -- NOTE: You can remove this on attach function to disable format on save
-      on_attach = function(client)
-        if client.server_capabilities.documentFormattingProvider then
-          vim.api.nvim_create_autocmd("BufWritePre", {
-            desc = "Auto format before save",
-            pattern = "<buffer>",
-            callback = vim.lsp.buf.formatting_sync,
-          })
-        end
-      end,
-    }
-  end,
 
   -- This function is run last
   -- good place to configure mappings and vim options
   polish = function()
     -- Set key bindings
-    vim.keymap.set("n", "<C-s>", ":w!<CR>")
     vim.keymap.set("n", "<C-l>", ":nohl<CR>")
 
-    local utils = require "core.utils"
-    if utils.is_available "neo-tree.nvim" then
-      vim.keymap.set("n", "K", "<cmd>Neotree toggle<cr>")
+    local function save_buffer()
+      vim.api.nvim_command("stopinsert")
+      vim.api.nvim_command("w!")
     end
+
+    vim.keymap.set("i", "<D-s>", save_buffer)
+    vim.keymap.set("n", "<D-s>", save_buffer)
+
+    vim.keymap.set("i", "<D-v>", "<C-r>+")
+    vim.keymap.set("x", "<D-v>", "<C-r>+")
+
+    vim.keymap.set("n", "<D-w>", ":Bd<CR>")
+    vim.keymap.set("n", "<D-p>", function() require 'telescope.builtin'.find_files({}) end)
+
+    vim.keymap.set("n", "[c", vim.diagnostic.goto_prev)
+    vim.keymap.set("n", "]c", vim.diagnostic.goto_next)
+
+    vim.keymap.del("t", "<esc>")
+    vim.keymap.set("t", "<esc><esc>", "<C-\\><C-n>")
+
+    vim.keymap.set("n", "<D-j>", function() vim.api.nvim_command("ToggleTerm float") end)
+    vim.keymap.set("t", "<D-j>", function() vim.api.nvim_command("ToggleTerm float") end)
 
     -- Set autocommands
     vim.api.nvim_create_augroup("packer_conf", {})
@@ -232,15 +219,20 @@ local config = {
       pattern = "plugins.lua",
       command = "source <afile> | PackerSync",
     })
+    vim.api.nvim_create_autocmd("TextYankPost", {
+      desc = "Highlight yarnked text",
+      group = "packer_conf",
+      callback = function() require 'vim.highlight'.on_yank { timeout = 250 } end
+    })
 
-    require'filetype'.setup {
+    require 'filetype'.setup {
       overrides = {
         extensions = {
-            -- Set the filetype of *.pn files to potion
-            fsproj = "xml",
-            fs = "fsharp",
-            fsx = "fsharp",
-            fsi = "fsharp",
+          -- Set the filetype of *.pn files to potion
+          fsproj = "xml",
+          fs = "fsharp",
+          fsx = "fsharp",
+          fsi = "fsharp",
         },
       }
     }
