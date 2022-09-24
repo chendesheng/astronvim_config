@@ -8,6 +8,8 @@ local config = {
     opt = {
       relativenumber = true, -- sets vim.opt.relativenumber
       clipboard = "",
+      laststatus = 1,
+      wrap = true,
     },
     g = {
       mapleader = " ", -- sets vim.g.mapleader
@@ -64,6 +66,11 @@ local config = {
       --     require("lsp_signature").setup()
       --   end,
       -- },
+    },
+    cmp = {
+      completion = {
+        completeopt = 'menu,menuone,noinsert'
+      }
     },
     -- All other entries override the setup() call for default plugins
     treesitter = {
@@ -237,6 +244,12 @@ local config = {
         },
       }
     }
+
+    if vim.g.neovide then
+      vim.g.neovide_cursor_animation_length = 0
+      vim.g.neovide_remember_window_size = true
+      vim.g.neovide_hide_mouse_when_typing = true
+    end
 
     -- require'cmp'.setup {
     --   sources = {
