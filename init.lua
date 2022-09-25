@@ -10,6 +10,7 @@ local config = {
       clipboard = "",
       laststatus = 1,
       wrap = true,
+      guifont = { "JetBrainsMono Nerd Font", ":h14" },
     },
     g = {
       mapleader = " ", -- sets vim.g.mapleader
@@ -50,6 +51,9 @@ local config = {
       ["declancm/cinnamon.nvim"] = { disable = true },
       ["max397574/better-escape.nvim"] = { disable = true },
       ["feline-nvim/feline.nvim"] = { disable = true },
+      ["akinsho/bufferline.nvim"] = { disable = true },
+      ["lukas-reineke/indent-blankline.nvim"] = { disable = true },
+      ["antoinemadec/FixCursorHold.nvim"] = { disable = true },
 
       -- You can also add new plugins here as well:
       -- { "ionide/Ionide-vim" },
@@ -57,6 +61,7 @@ local config = {
       { "https://tpope.io/vim/unimpaired.git" },
       { "https://tpope.io/vim/repeat.git" },
       { "nathom/filetype.nvim" },
+      { "goolord/alpha-nvim" },
       -- { "OmniSharp/omnisharp-vim" },
       -- { "hrsh7th/cmp-omni" },
       -- {
@@ -93,6 +98,27 @@ local config = {
         },
       },
     },
+    notify = {
+      max_width = 50,
+      timeout = 0,
+      stages = "fade",
+    },
+    ['which-key'] = {
+      triggers = { "<leader>" },
+      window = {
+        border = "none",
+        margin = { 0, 0, 0, 0 },
+        padding = { 0, 0, 0, 0 },
+      },
+      layout = {
+        height = { min = 5 },
+        align = "left",
+        spacing = 5,
+      },
+    },
+    session_manager = {
+      autoload_mode = 'LastSession',
+    },
     -- ['nvim-cmp'] = {
     --   sources = {
     --     { name = "omni" },
@@ -112,22 +138,6 @@ local config = {
 
   -- Modify which-key registration
   ["which-key"] = {
-    -- Add bindings
-    register_mappings = {
-      -- first key is the mode, n == normal mode
-      n = {
-        -- second key is the prefix, <leader> prefixes
-        ["<leader>"] = {
-          -- which-key registration table for normal mode, leader prefix
-          -- ["N"] = { "<cmd>tabnew<cr>", "New Buffer" },
-          [','] = { function() require 'telescope.builtin'.find_files({ cwd = '~/.config/nvim/lua/user/' }) end,
-            "Find config file" }
-        },
-        g = {
-          h = { vim.lsp.buf.hover, "Hover symbol details" },
-        },
-      },
-    },
   },
 
   -- CMP Source Priorities
@@ -193,6 +203,10 @@ local config = {
   -- This function is run last
   -- good place to configure mappings and vim options
   polish = function()
+    function inspect(x)
+      print(vim.inspect(x))
+    end
+
     -- Set key bindings
     vim.keymap.set("n", "<C-l>", ":nohl<CR>")
 
@@ -200,6 +214,11 @@ local config = {
       vim.api.nvim_command("stopinsert")
       vim.api.nvim_command("w!")
     end
+
+    vim.keymap.set("n", "<leader>,", function()
+      require 'telescope.builtin'.find_files({ cwd = '~/.config/nvim/lua/user/' })
+    end)
+    vim.keymap.set("n", "gh", vim.lsp.buf.hover)
 
     vim.keymap.set("i", "<D-s>", save_buffer)
     vim.keymap.set("n", "<D-s>", save_buffer)
@@ -218,6 +237,8 @@ local config = {
 
     vim.keymap.set("n", "<D-j>", function() vim.api.nvim_command("ToggleTerm float") end)
     vim.keymap.set("t", "<D-j>", function() vim.api.nvim_command("ToggleTerm float") end)
+
+    vim.keymap.set("n", "<leader>fs", function() vim.api.nvim_command("SessionManager load_session") end)
 
     -- Set autocommands
     vim.api.nvim_create_augroup("packer_conf", {})
@@ -241,6 +262,7 @@ local config = {
           fs = "fsharp",
           fsx = "fsharp",
           fsi = "fsharp",
+          erb = "ruby",
         },
       }
     }
@@ -249,6 +271,10 @@ local config = {
       vim.g.neovide_cursor_animation_length = 0
       vim.g.neovide_remember_window_size = true
       vim.g.neovide_hide_mouse_when_typing = true
+
+      vim.api.nvim_command("SessionManager load_last_session")
+    else
+      vim.api.nvim_command("SessionManager load_current_dir_session")
     end
 
     -- require'cmp'.setup {
