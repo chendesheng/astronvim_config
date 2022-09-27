@@ -119,6 +119,16 @@ local config = {
     session_manager = {
       autoload_mode = 'LastSession',
     },
+    ['neo-tree'] = {
+      event_handlers = {
+        {
+          event = "neo_tree_buffer_enter",
+          handler = function()
+            vim.o.laststatus = 0
+          end
+        },
+      },
+    },
     -- ['nvim-cmp'] = {
     --   sources = {
     --     { name = "omni" },
