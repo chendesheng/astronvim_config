@@ -8,9 +8,9 @@ local config = {
     opt = {
       relativenumber = true, -- sets vim.opt.relativenumber
       clipboard = "",
-      laststatus = 1,
       wrap = true,
       guifont = { "JetBrainsMono Nerd Font", ":h14" },
+      showtabline = 0,
     },
     g = {
       mapleader = " ", -- sets vim.g.mapleader
@@ -54,6 +54,8 @@ local config = {
       ["akinsho/bufferline.nvim"] = { disable = true },
       ["lukas-reineke/indent-blankline.nvim"] = { disable = true },
       ["antoinemadec/FixCursorHold.nvim"] = { disable = true },
+      ["p00f/nvim-ts-rainbow"] = { disable = true },
+      ["windwp/nvim-autopairs"] = { disable = true },
 
       -- You can also add new plugins here as well:
       -- { "ionide/Ionide-vim" },
@@ -61,7 +63,7 @@ local config = {
       { "https://tpope.io/vim/unimpaired.git" },
       { "https://tpope.io/vim/repeat.git" },
       { "nathom/filetype.nvim" },
-      { "goolord/alpha-nvim" },
+      -- { "goolord/alpha-nvim" },
       -- { "OmniSharp/omnisharp-vim" },
       -- { "hrsh7th/cmp-omni" },
       -- {
@@ -119,21 +121,12 @@ local config = {
     session_manager = {
       autoload_mode = 'LastSession',
     },
-    ['neo-tree'] = {
-      event_handlers = {
-        {
-          event = "neo_tree_buffer_enter",
-          handler = function()
-            vim.o.laststatus = 0
-          end
-        },
-      },
-    },
-    -- ['nvim-cmp'] = {
-    --   sources = {
-    --     { name = "omni" },
-    --   },
-    -- }
+    heirline = function(config)
+      -- the first item is the statusline
+      -- the second item is the winbar
+      config[2] = nil
+      return config
+    end,
   },
 
   -- LuaSnip Options
@@ -206,8 +199,9 @@ local config = {
 
   -- Diagnostics configuration (for vim.diagnostics.config({}))
   diagnostics = {
-    virtual_text = true,
-    underline = false,
+    virtual_text = false,
+    underline = true,
+    signs = false,
   },
 
   -- This function is run last
@@ -242,7 +236,7 @@ local config = {
     vim.keymap.set("n", "[c", vim.diagnostic.goto_prev)
     vim.keymap.set("n", "]c", vim.diagnostic.goto_next)
 
-    vim.keymap.del("t", "<esc>")
+    -- vim.keymap.del("t", "<esc>")
     vim.keymap.set("t", "<esc><esc>", "<C-\\><C-n>")
 
     vim.keymap.set("n", "<D-j>", function() vim.api.nvim_command("ToggleTerm float") end)
