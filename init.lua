@@ -263,6 +263,14 @@ local config = {
       group = "packer_conf",
       callback = function() require 'vim.highlight'.on_yank { timeout = 250 } end
     })
+    vim.api.nvim_create_autocmd("TermOpen", {
+      desc = "Hide line number",
+      group = "packer_conf",
+      callback = function()
+        vim.opt_local.relativenumber = false
+        vim.opt_local.number = false
+      end
+    })
 
     require 'filetype'.setup {
       overrides = {
